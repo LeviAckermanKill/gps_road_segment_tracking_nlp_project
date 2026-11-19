@@ -4,7 +4,7 @@ venv/
 env/
 __pycache__/
 *.py[cod]
-*$py.class
+*.py.class
 *.egg-info/
 dist/
 build/
@@ -13,7 +13,7 @@ build/
 # Testing
 .pytest_cache/
 *.coverage
-.coverage
+coverage/
 htmlcov/
 .tox/
 
@@ -29,9 +29,7 @@ htmlcov/
 Thumbs.db
 desktop.ini
 
-# Project
-backend/cache/*.geojson
-backend/cache/*.graphml
+# Runtime cache (bundled fallback files are tracked explicitly)
 backend/cache/regions/
 data/test_write.txt
 *.log

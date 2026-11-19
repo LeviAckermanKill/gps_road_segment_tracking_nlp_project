@@ -1,0 +1,10 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {"type":"Feature","properties":{"id":"r1","name":"Borough High Street"},"geometry":{"type":"LineString","coordinates":[[-0.0915,51.5040],[-0.0902,51.5050]]}},
+    {"type":"Feature","properties":{"id":"r2","name":"Borough High Street"},"geometry":{"type":"LineString","coordinates":[[-0.0902,51.5050],[-0.0892,51.5058]]}},
+    {"type":"Feature","properties":{"id":"r3","name":"Borough High Street"},"geometry":{"type":"LineString","coordinates":[[-0.0892,51.5058],[-0.0881,51.5067]]}},
+    {"type":"Feature","properties":{"id":"r4","name":"London Bridge Approach"},"geometry":{"type":"LineString","coordinates":[[-0.0881,51.5067],[-0.0868,51.5074]]}},
+    {"type":"Feature","properties":{"id":"r5","name":"Southwark Street"},"geometry":{"type":"LineString","coordinates":[[-0.0915,51.5040],[-0.0908,51.5031]]}}
+  ]
+}

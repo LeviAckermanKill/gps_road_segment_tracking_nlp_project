@@ -1,0 +1,11 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>GPS HMM Map Matcher</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <style>body{margin:0;font-family:system-ui}.layout{display:grid;grid-template-columns:320px 1fr;height:100vh}aside{padding:16px;overflow:auto}#map{height:100vh}button,input{width:100%;margin:6px 0;padding:8px}.log{font-family:monospace;font-size:12px;background:#f4f4f4;padding:8px}@media(max-width:700px){.layout{grid-template-columns:1fr}.layout aside{height:300px}.layout #map{height:calc(100vh - 300px)}}</style>
+</head>
+<body><div class="layout"><aside><h2>HMM Map Matcher</h2><p>Hidden states: road segments<br>Observations: noisy GPS fixes</p><label>Upload JSON or CSV<input id="file" type="file" accept=".json,.csv"></label><button id="start">Start live GPS</button><button id="match">Match route</button><button id="sample">Load sample trace</button><button id="clear">Clear</button><div id="metrics"></div><div id="log" class="log"></div></aside><div id="map"></div></div>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="/static/app.js"></script></body></html>

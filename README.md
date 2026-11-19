@@ -1,7 +1,4 @@
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 44436c6 (Initial GPS HMM map matching project)
+
 # GPS Road Matching with HMM and Viterbi
 
 A full-stack demonstration that reconstructs a likely road route from noisy GPS samples. The backend represents nearby directed road segments as hidden states, scores GPS-to-road distances with a Gaussian emission model, scores route-distance versus GPS-distance with an exponential transition model, and decodes the most likely sequence with log-space Viterbi. It serves a Leaflet map for CSV/GPX uploads, supplied traces, and browser live GPS.
@@ -66,10 +63,4 @@ The provided reference is simulated from hand-authored waypoints; it is useful f
 - `tests/`: unit and API tests
 - `docs/`: report and architecture diagrams
 - `presentation/`: editable slide source in Markdown
-<<<<<<< HEAD
-=======
-# gps_road_segment_tracking_nlp_project
-GPS map-matching using a first-order HMM: hidden states are road segments, observations are noisy GPS points. Transition and emission probabilities score road transitions and point-to-road likelihood; Viterbi decodes the most likely route. It mirrors HMM POS tagging and targets ≥90% point accuracy.
->>>>>>> 3f866d96c8048106de177b3026a1e72b98ede743
-=======
->>>>>>> 44436c6 (Initial GPS HMM map matching project)
+

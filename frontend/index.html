@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GPS Map Matching — HMM-Based Road Snapping</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+    <!-- ===== Sidebar ===== -->
+    <aside class="sidebar" id="sidebar">
+
+        <!-- Header -->
+        <div class="header-section">
+            <h1 class="app-title">
+                <svg class="title-icon" viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="10" r="3"/><path d="M12 2a8 8 0 0 0-8 8c0 5.4 7 11.5 7.3 11.8a1 1 0 0 0 1.4 0C13 21.5 20 15.4 20 10a8 8 0 0 0-8-8z"/>
+                </svg>
+                GPS Map Matching
+            </h1>
+            <p class="app-subtitle">Hidden Markov Model &middot; Viterbi Algorithm</p>
+        </div>
+
+        <!-- World map tools -->
+        <div class="card world-tools">
+            <h3>Explore the world</h3>
+            <label class="tool-label" for="place-search">Find a place</label>
+            <div class="search-row">
+                <input id="place-search" type="search" placeholder="City, landmark, address" autocomplete="off" />
+                <button class="btn btn-primary search-button" id="btn-place-search" type="button">Find</button>
+            </div>
+            <select id="place-results" class="place-results" aria-label="Search results" hidden>
+                <option value="">Choose a result</option>
+            </select>
+            <div class="world-actions">
+                <button class="btn btn-secondary" id="btn-world-view" type="button">World view</button>
+                <button class="btn btn-secondary" id="btn-locate-me" type="button">My location</button>
+            </div>
+            <button class="btn btn-primary" id="btn-load-roads" type="button">Load roads in view</button>
+            <p class="tool-hint" id="world-status">Search globally, zoom to an area no wider than 8 km, then load its roads for HMM matching.</p>
+            <p class="provider-credit">Place search by Nominatim · <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">© OpenStreetMap contributors</a></p>
+        </div>
+
+        <!-- File Upload Card -->
+        <div class="card">
+            <h3>📂 Upload GPS Trace</h3>
+            <div class="dropzone" id="dropzone">
+                <svg class="dropzone-icon" viewBox="0 0 24 24" width="36" height="36" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
+                </svg>
+                <p class="dropzone-text">Drag &amp; drop a file here</p>
+                <p class="dropzone-hint">or click to browse &middot; .csv, .gpx</p>
+                <input type="file" id="file-input" accept=".csv,.gpx" hidden />
+            </div>
+            <p class="file-name" id="file-name"></p>
+            <button class="btn btn-primary" id="btn-upload-match" disabled>Match GPS Trace</button>
+        </div>
+
+        <!-- Sample Data Card -->
+        <div class="card">
+            <h3>🗂️ Sample Data</h3>
+            <select id="sample-select">
+                <option value="">— Select a sample trace —</option>
+                <option value="sample_trace_delhi">Delhi Trace</option>
+                <option value="sample_trace_clean">Clean Trace</option>
+                <option value="sample_trace_noisy">Noisy Trace</option>
+                <option value="sample_trace_sparse">Sparse Trace</option>
+            </select>
+            <button class="btn btn-primary" id="btn-load-sample" style="margin-top:12px" disabled>Load &amp; Match</button>
+        </div>
+
+        <!-- Live GPS Card -->
+        <div class="card">
+            <h3>📡 Live GPS Tracking</h3>
+            <div class="live-status" id="live-status">
+                <span class="status-dot" id="status-dot"></span>
+                <span class="status-text" id="status-text">Inactive</span>
+                <span class="point-counter" id="point-counter">0 pts</span>
+            </div>
+            <div class="live-buttons">
+                <button class="btn btn-success" id="btn-start-live">Start Live Tracking</button>
+                <button class="btn btn-danger" id="btn-stop-live" style="display:none">Stop Tracking</button>
+            </div>
+        </div>
+
+        <!-- Results Card -->
+        <div class="card results-panel" id="results-panel">
+            <h3>📊 Matching Results</h3>
+            <div class="metric-grid">
+                <div class="metric-item">
+                    <div class="metric-value" id="metric-points">—</div>
+                    <div class="metric-label">GPS Points</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-value" id="metric-segments">—</div>
+                    <div class="metric-label">Matched Segments</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-value" id="metric-time">—</div>
+                    <div class="metric-label">Processing (ms)</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-value" id="metric-rmse">—</div>
+                    <div class="metric-label">RMSE (m)</div>
+                </div>
+            </div>
+            <div class="accuracy-bar-container">
+                <div class="accuracy-label">
+                    <span>Accuracy</span>
+                    <span id="metric-accuracy">—</span>
+                </div>
+                <div class="accuracy-bar">
+                    <div class="accuracy-bar-fill" id="accuracy-bar-fill" style="width:0%"></div>
+                </div>
+            </div>
+            <button class="btn btn-secondary export-button" id="btn-export-match" type="button" disabled>Export matched route GeoJSON</button>
+        </div>
+
+        <!-- Legend -->
+        <div class="card">
+            <h3>🗺️ Map Legend</h3>
+            <div class="legend-item">
+                <span class="legend-color" style="background:#ef4444"></span>
+                <span>Raw GPS Points</span>
+            </div>
+            <div class="legend-item">
+                <span class="legend-color" style="background:#2563eb; height:4px"></span>
+                <span>Matched Route</span>
+            </div>
+            <div class="legend-item">
+                <span class="legend-color" style="background:#22c55e; border-top:2px dashed #22c55e; height:0"></span>
+                <span>Ground Truth</span>
+            </div>
+            <div class="legend-item">
+                <span class="legend-color" style="background:#94a3b8; height:2px"></span>
+                <span>Road Network</span>
+            </div>
+        </div>
+    </aside>
+
+    <!-- ===== Map ===== -->
+    <div id="map-container"></div>
+
+    <!-- ===== Toast Container ===== -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <!-- ===== Loading Overlay ===== -->
+    <div class="loading-overlay" id="loading-overlay">
+        <div class="loading-box">
+            <div class="spinner"></div>
+            <p class="loading-text">Processing GPS trace…</p>
+        </div>
+    </div>
+
+    <!-- Scripts (order matters) -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="js/map.js"></script>
+    <script src="js/gps.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
